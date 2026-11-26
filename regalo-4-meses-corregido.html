@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4 meses contigo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--noche:#1a1033;--noche2:#2b1850;--rosa:#ff8fb1;--papel:#fff6f8;--tinta:#4a2545}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:'Nunito',system-ui,sans-serif;color:var(--papel);background:radial-gradient(ellipse at 50% 0%,var(--noche2),var(--noche) 70%);overflow:hidden}
+#estrellas,#lluvia{position:fixed;inset:0;pointer-events:none}
+#estrellas{z-index:0}#lluvia{z-index:5}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;animation:tw 3s infinite ease-in-out}
+@keyframes tw{50%{opacity:.15;transform:scale(.6)}}
+.fall{position:absolute;top:-30px;animation:caer linear forwards}
+@keyframes caer{to{transform:translateY(110vh) rotate(360deg)}}
+
+#portada{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;transition:opacity 1s,visibility 1s}
+#portada.off{opacity:0;visibility:hidden}
+#portada h1{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:clamp(2.4rem,9vw,5rem);line-height:1.05}
+#portada p{margin:14px 0 40px;opacity:.8;max-width:30ch}
+#boton{width:130px;height:130px;border-radius:50%;border:0;cursor:pointer;font-size:3.4rem;background:radial-gradient(circle at 35% 30%,#ffc2d6,var(--rosa) 55%,#d94d82);animation:latido 1.6s infinite}
+@keyframes latido{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,143,177,.6)}30%{transform:scale(1.1)}70%{box-shadow:0 0 0 38px rgba(255,143,177,0)}100%{transform:scale(1)}}
+#portada small{margin-top:22px;opacity:.6}
+
+#libro{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:opacity 1.2s .4s}
+#libro.on{opacity:1;visibility:visible}
+#hoja{width:min(94vw,640px);max-height:78vh;overflow:auto;background:var(--papel);color:var(--tinta);border-radius:6px 22px 22px 6px;padding:30px 28px;box-shadow:-10px 0 0 -4px #e9a3bd,0 25px 60px rgba(0,0,0,.5);text-align:center;transform-origin:left center}
+#hoja.pasa{animation:pasa .7s ease}
+@keyframes pasa{0%{transform:perspective(1200px) rotateY(-70deg);opacity:0}100%{transform:none;opacity:1}}
+#hoja h2{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.8rem,6vw,2.6rem);color:#c2386f;margin-bottom:12px}
+#hoja p{font-size:1.05rem;line-height:1.7;white-space:pre-line}
+.num{font-family:'Cormorant Garamond',serif;font-size:5.5rem;line-height:1;color:#c2386f}
+.fotos{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.marco{position:relative;width:min(100%,260px);aspect-ratio:3/4;background:#ffe3ec;border:8px solid #fff;outline:1px solid #f1bccd;box-shadow:0 8px 20px rgba(120,40,80,.25);cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:.95rem;color:#b5557f;transform:rotate(-2deg);transition:transform .3s}
+.marco:nth-child(even){transform:rotate(2deg)}
+.marco:hover{transform:rotate(0) scale(1.03)}
+.marco img{width:100%;height:100%;object-fit:cover}
+.marco input{display:none}
+.solo .marco{width:min(100%,300px)}
+.razones{list-style:none;padding:0;text-align:left;display:grid;gap:10px}
+.razones li{background:#ffeef3;border-radius:14px;padding:11px 14px;cursor:pointer}
+.razones li span{display:none}
+.razones li.ab span{display:block;margin-top:6px}
+.razones li b{color:#c2386f}
+#regalo{margin-top:10px;font-size:3.6rem;background:none;border:0;cursor:pointer;animation:latido 1.6s infinite;border-radius:50%}
+.nav{display:flex;align-items:center;gap:18px;margin-top:16px}
+.nav button{border:0;border-radius:30px;padding:11px 22px;font:600 1rem 'Nunito';cursor:pointer;background:var(--rosa);color:#3a1030}
+.nav button:disabled{opacity:.3;cursor:default}
+#pt{opacity:.7;min-width:50px;text-align:center}
+#mus{position:fixed;top:14px;right:14px;z-index:9;border:0;border-radius:50%;width:42px;height:42px;font-size:1.2rem;cursor:pointer;background:rgba(255,255,255,.15);color:#fff;display:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="estrellas"></div><div id="lluvia"></div>
+<button id="mus" title="Música">🎵</button>
+<audio id="audio" src="Heaven.mp3" loop></audio>
+
+<div id="portada">
+  <h1 id="tituloPortada"></h1>
+  <p id="subPortada"></p>
+  <button id="boton" aria-label="Abrir regalo">💗</button>
+  <small>Toca el corazón</small>
+</div>
+
+<div id="libro">
+  <div id="hoja"></div>
+  <div class="nav"><button id="ant">←</button><span id="pt"></span><button id="sig">→</button></div>
+</div>
+
+<script>
+/* ✏️ EDITA AQUÍ */
+const CONFIG = {
+  ella: "Mi amor",
+  tu: "Jeremy",
+  inicio: "2026-07-25",            // fecha en que empezaron (AAAA-MM-DD)
+  tituloPortada: "4 meses contigo",
+  subPortada: "Hice algo pequeño para algo que para mí es enorme."
+};
+
+const PAGINAS = [
+  { tipo:"texto", titulo:"Para ti, {ella}",
+    texto:"Hoy cumplimos 4 meses y quise detener el tiempo un ratito para decirte lo que a veces se me queda en el pecho.\n\nGracias por llegar a mi vida y hacerla más bonita." },
+  { tipo:"foto", titulo:"Así empezó todo", img:"imagenes/ima 1.jpeg",
+    texto:"Todavía me acuerdo de lo nervioso que estaba. Y aun así, fue la mejor decisión que he tomado." },
+  { tipo:"contador", titulo:"Cuatro meses de nosotros" },
+  { tipo:"fotos", titulo:"Mis momentos favoritos", img:["imagenes/ima 2.jpeg","imagenes/ima 3.jpeg"],
+    texto:"No necesito un lugar especial. Contigo cualquier momento ya lo es." },
+  { tipo:"razones", titulo:"Cosas que amo de ti",
+    razones:[
+      ["Tu sonrisa","Me arregla el día aunque venga cansado."],
+      ["Tu forma de ser","Eres auténtica, y eso me encanta."],
+      ["Cómo me haces sentir","En paz, en casa, yo mismo."],
+      ["Tu forma de cuidarme","Los detalles pequeños que haces sin darte cuenta."]
+    ] },
+  { tipo:"foto", titulo:"Lo que sueño contigo", img:"imagenes/ima 4.jpeg",
+    texto:"Más risas, más abrazos largos, y muchos meses más como este." },
+  { tipo:"final", titulo:"Te amo, {ella}",
+    texto:"Gracias por estos 4 meses.\nPor cada risa, cada abrazo y cada día a tu lado.\n\nVamos por muchos más. 💗\n\n— " }
+];
+
+const $=id=>document.getElementById(id);
+const sub=s=>(s||"").replace(/\{ella\}/g,CONFIG.ella).replace(/\{tu\}/g,CONFIG.tu);
+
+for(let i=0;i<90;i++){const s=document.createElement('i');s.className='star';
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;transform:scale(${.5+Math.random()})`;
+  $('estrellas').appendChild(s)}
+
+function lluvia(n=30,emojis=["💗","💖","✨","🌸","💕"]){
+  for(let i=0;i<n;i++){const e=document.createElement('span');e.className='fall';
+    e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    e.style.cssText=`left:${Math.random()*100}%;font-size:${14+Math.random()*24}px;animation-duration:${3+Math.random()*4}s;animation-delay:${Math.random()*1.5}s`;
+    $('lluvia').appendChild(e);setTimeout(()=>e.remove(),9000)}}
+
+$('tituloPortada').textContent=CONFIG.tituloPortada;
+$('subPortada').textContent=sub(CONFIG.subPortada);
+
+let p=0;
+function marco(src){
+  return `<div class="marco">${src?`<img src="${encodeURI(src)}" alt="">`:''}</div>`}
+function dias(){const d=Math.floor((Date.now()-new Date(CONFIG.inicio+"T00:00:00"))/864e5);return Math.max(d||0,0)}
+
+function engancharFotos(){
+  document.querySelectorAll('.marco input').forEach(inp=>inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=ev=>{inp.parentElement.innerHTML=`<img src="${ev.target.result}" alt=""><input type="file" accept="image/*">`;engancharFotos()};
+    r.readAsDataURL(f)})}
+
+function render(){
+  const pg=PAGINAS[p];
+  let h=`<h2>${sub(pg.titulo)}</h2>`;
+  if(pg.tipo==="foto") h+=`<div class="fotos solo">${marco(pg.img)}</div>`;
+  if(pg.tipo==="fotos") h+=`<div class="fotos">${marco((pg.img||[])[0])}${marco((pg.img||[])[1])}</div>`;
+  if(pg.tipo==="contador") h+=`<div class="num" id="n">0</div><p>días siendo felices juntos,\ny contando. ♾️</p>`;
+  if(pg.texto) h+=`<p>${sub(pg.texto)}</p>`;
+  if(pg.tipo==="razones") h+=`<ul class="razones">${pg.razones.map(r=>`<li><b>💗 ${r[0]}</b><span>${r[1]}</span></li>`).join("")}</ul><p style="margin-top:10px;font-size:.85rem;opacity:.7">Toca cada una</p>`;
+  if(pg.tipo==="final") h+=`<button id="regalo" aria-label="Sorpresa">🎁</button>`;
+  $('hoja').innerHTML=h;
+  $('hoja').classList.remove('pasa');void $('hoja').offsetWidth;$('hoja').classList.add('pasa');
+  $('hoja').scrollTop=0;
+  $('pt').textContent=`${p+1} / ${PAGINAS.length}`;
+  $('ant').disabled=p===0;$('sig').disabled=p===PAGINAS.length-1;
+
+  engancharFotos();
+  document.querySelectorAll('.razones li').forEach(li=>li.onclick=()=>{li.classList.toggle('ab');if(li.classList.contains('ab'))lluvia(6,["💗"])});
+  if(pg.tipo==="contador"){const t=dias();let c=0;const iv=setInterval(()=>{c+=Math.max(1,Math.ceil(t/40));if(c>=t){c=t;clearInterval(iv)}$('n').textContent=c},40)}
+  if(pg.tipo==="final")$('regalo').onclick=()=>{lluvia(80);$('regalo').textContent="💝"};
+}
+
+$('sig').onclick=()=>{if(p<PAGINAS.length-1){p++;render()}};
+$('ant').onclick=()=>{if(p>0){p--;render()}};
+document.addEventListener('keydown',e=>{if(e.key==="ArrowRight")$('sig').click();if(e.key==="ArrowLeft")$('ant').click()});
+
+$('boton').onclick=()=>{
+  $('portada').classList.add('off');$('libro').classList.add('on');
+  lluvia(50);render();
+  $('audio').play().then(()=>{$('mus').style.display='block'}).catch(()=>{});
+};
+$('mus').onclick=()=>{const a=$('audio');a.paused?a.play():a.pause();$('mus').style.opacity=a.paused?.4:1};
+</script>
+</body>
+</html>
